@@ -4,10 +4,18 @@
         "name": "Better Posters",
         "description": "Better Posters is a Jellyfin image fetcher for Movies and Shows that pulls configurable primary posters from btttr.cc.\n",
         "overview": "Fetch configurable Better Posters images from btttr.cc",
-        "owner": "Neureka",
+        "owner": "Malo-LC",
         "category": "MoviesAndShows",
-        "imageUrl": "https://raw.githubusercontent.com/neurekadev/better-posters/master/Assets/Catalog.png",
+        "imageUrl": "https://raw.githubusercontent.com/Malo-LC/better-posters/master/Assets/Catalog.png",
         "versions": [
+            {
+                "version": "2.0.0.0",
+                "changelog": "### Changed\n- Target Jellyfin 12.4 only. Jellyfin 10.11 and older are no longer supported.\n- Rebuild the plugin against .NET 10 (`net10.0`) and the Jellyfin 12.4 packages.\n",
+                "targetAbi": "12.4.0.0",
+                "sourceUrl": "https://github.com/Malo-LC/better-posters/releases/download/2.0.0/better-posters_2.0.0.0.zip",
+                "checksum": "4fe38d86785ee82b3c09a12c424e7dba",
+                "timestamp": "2026-11-22T18:27:36Z"
+            },
             {
                 "version": "1.0.5.0",
                 "changelog": "### Changed\n- Move Better Posters updates to the official GitHub project; replace the old Jellyfin update source and reinstall the plugin to keep receiving releases.\n",
