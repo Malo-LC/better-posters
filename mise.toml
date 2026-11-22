@@ -1,0 +1,31 @@
+[tools]
+# Jellyfin 10.11 plugins target .NET 9 (net9.0).
+dotnet = "9.0.321"
+# uv provisions Python 3.13 (matching CI) and installs JPRM.
+uv = "0.13.8"
+"pypi:jprm" = { version = "1.1.0", python = "3.13" }
+
+[tasks.build]
+description = "Build the plugin in Release"
+run = "mise exec -- dotnet build BetterPosters/BetterPosters.csproj --configuration Release"
+
+[tasks.test]
+description = "Run the unit tests"
+run = "mise exec -- dotnet test BetterPosters.sln --configuration Release"
+
+[tasks.lint]
+description = "Check formatting and analyzer rules without modifying files"
+run = "mise exec -- dotnet format BetterPosters.sln --verify-no-changes"
+
+[tasks.package]
+description = "Package the plugin zip into ./artifacts with JPRM"
+run = "mise exec -- uv run --no-project --python 3.13 scripts/package.py"
+
+[tasks.verify]
+description = "Build, lint, test and package the plugin (sequentially)"
+run = """
+mise run build
+mise run lint
+mise run test
+mise run package
+"""

@@ -4,17 +4,18 @@
 
 # Better Posters
 
-[![Release](https://img.shields.io/github/v/release/neurekadev/better-posters?style=flat-square&logo=github&logoColor=F43F5E&label=Release&color=F43F5E)](https://github.com/neurekadev/better-posters/releases/latest)
-[![Pipeline](https://img.shields.io/github/actions/workflow/status/neurekadev/better-posters/CI.yml?branch=master&style=flat-square&logo=githubactions&logoColor=8B5CF6&label=Pipeline&color=8B5CF6)](https://github.com/neurekadev/better-posters/actions/workflows/CI.yml)
-[![License](https://img.shields.io/github/license/neurekadev/better-posters?style=flat-square&label=License&color=14B8A6&logo=opensourceinitiative&logoColor=14B8A6)](./LICENSE.md)
-[![AI](https://img.shields.io/badge/AI-assisted-5786FE?style=flat-square&logo=deepseek&logoColor=5786FE)](https://github.com/neurekadev/better-posters)
-[![Stars](https://img.shields.io/github/stars/neurekadev/better-posters?style=flat-square&label=Stars&color=EAB308&logo=googlegemini&logoColor=EAB308)](https://github.com/neurekadev/better-posters)
+[![Release](https://img.shields.io/github/v/release/Malo-LC/better-posters?style=flat-square&logo=github&logoColor=F43F5E&label=Release&color=F43F5E)](https://github.com/Malo-LC/better-posters/releases/latest)
+[![Pipeline](https://img.shields.io/github/actions/workflow/status/Malo-LC/better-posters/CI.yml?branch=master&style=flat-square&logo=githubactions&logoColor=8B5CF6&label=Pipeline&color=8B5CF6)](https://github.com/Malo-LC/better-posters/actions/workflows/CI.yml)
+[![License](https://img.shields.io/github/license/Malo-LC/better-posters?style=flat-square&label=License&color=14B8A6&logo=opensourceinitiative&logoColor=14B8A6)](./LICENSE.md)
+[![Stars](https://img.shields.io/github/stars/Malo-LC/better-posters?style=flat-square&label=Stars&color=EAB308&logo=googlegemini&logoColor=EAB308)](https://github.com/Malo-LC/better-posters)
 
 **Better Posters** is an unofficial Jellyfin plugin that lets you replace standard movie and show posters with customizable posters from [btttr.cc](https://btttr.cc).
 
 </div>
 
 **Minimum Jellyfin version:** 10.11.10
+
+> **Maintained fork.** This repository is a hard fork of the archived [neurekadev/better-posters](https://github.com/neurekadev/better-posters). It keeps the original plugin GUID and configuration format, and is maintained against the latest Jellyfin 10.11.x release.
 
 ## Features
 
@@ -32,7 +33,7 @@
 2. Add this repository URL:
 
     ```text
-    https://raw.githubusercontent.com/neurekadev/better-posters/master/manifest.json
+    https://raw.githubusercontent.com/Malo-LC/better-posters/master/manifest.json
     ```
 
 3. Open **Dashboard -> Plugins -> Catalog**.
@@ -42,7 +43,7 @@
 
 ### Option 2: Install Manually from a Release
 
-1. Download the latest `better-posters_*.zip` asset from the [GitHub releases page](https://github.com/neurekadev/better-posters/releases/latest).
+1. Download the latest `better-posters_*.zip` asset from the [GitHub releases page](https://github.com/Malo-LC/better-posters/releases/latest).
 2. Stop Jellyfin.
 3. Create a Better Posters plugin folder under your Jellyfin plugins directory.
 4. Extract the release zip into that folder.
@@ -51,21 +52,17 @@
 
 ### Option 3: Build from Source
 
-1. Install the .NET SDK that can build `net9.0` projects.
-2. From this repository, run:
+Development tooling is managed by [mise](https://mise.jdx.dev/). Install mise, then from this repository:
 
-    ```shell
-    dotnet publish BetterPosters/BetterPosters.csproj -c Release
-    ```
+```shell
+mise trust
+mise install
+mise run package
+```
 
-3. Locate the published `BetterPosters.dll`.
-4. Stop Jellyfin.
-5. Create a Better Posters plugin folder under your Jellyfin plugins directory.
-6. Copy `BetterPosters.dll` into that folder.
-7. Start Jellyfin.
-8. Confirm **Better Posters** appears under **Dashboard -> Plugins -> My Plugins**.
+The plugin zip is written to `artifacts/better-posters_<version>.zip`. Extract it into a Better Posters plugin folder under your Jellyfin plugins directory and restart Jellyfin.
 
-This plugin is built for Jellyfin 10.11.10 and may not load on older Jellyfin versions.
+The plugin targets Jellyfin 10.11.10 and may not load on older Jellyfin versions.
 
 ## Configuration & Setup
 
@@ -105,6 +102,100 @@ The **Update Better Posters** scheduled task is unscheduled by default. Configur
 2. Select **Update Better Posters**.
 3. Add the schedule you want Jellyfin to use.
 4. The scheduled task will replace matching movie and show primary images using the current poster settings.
+
+## How It Works
+
+The plugin is a thin adapter between Jellyfin and btttr.cc:
+
+1. `BetterPostersImageProvider` is registered as a Jellyfin remote image provider. For Movies and Series that have an IMDb ID, it advertises exactly one remote primary image.
+2. `BetterPosterUrlBuilder` turns the plugin configuration into a btttr.cc URL:
+
+    ```text
+    https://btttr.cc/{poster-path}/imdb/poster-default/{imdbId}.jpg?tag=none&lang=fr&rs=IM
+    ```
+
+    - `poster-path` combines the genre/rating variant (`poster`, `poster-g`, `poster-r`, `poster-n`) with optional `q` (quality tags) and `a` (age rating) suffixes.
+    - `tag=none` is sent only when trend tags are disabled.
+    - `lang` is sent only for non-English languages.
+    - `rs` is sent only when ratings are enabled and the rating source is not the btttr.cc average.
+
+3. `BetterPostersUpdateTask` is an optional scheduled task. It walks every Movie and Series with an IMDb ID, skips items where Better Posters is not enabled as an image fetcher for the library, downloads the configured poster, and replaces the primary image.
+
+### Project Layout
+
+| Path | Responsibility |
+| --- | --- |
+| `BetterPosters/Plugin.cs` | Plugin entry point, GUID, embedded configuration page. |
+| `BetterPosters/PluginServiceRegistrator.cs` | Registers the image provider and the scheduled task in Jellyfin's DI container. |
+| `BetterPosters/Providers/BetterPostersImageProvider.cs` | Implements `IRemoteImageProvider` for Movies and Series. |
+| `BetterPosters/BetterPosterUrlBuilder.cs` | Maps configuration to btttr.cc URLs (pure, unit-tested). |
+| `BetterPosters/ScheduledTasks/BetterPostersUpdateTask.cs` | Bulk poster replacement task. |
+| `BetterPosters/Configuration/PluginConfiguration.cs` | Serializable plugin settings and enums. |
+| `BetterPosters/Configuration/configPage.html` | Embedded Jellyfin Web configuration page. |
+| `BetterPosters.Tests/` | xUnit tests for URL building and task behavior. |
+
+## Development
+
+### Prerequisites
+
+Only [mise](https://mise.jdx.dev/) is required. `mise.toml` pins the .NET SDK, [uv](https://docs.astral.sh/uv/), and JPRM versions used locally and by CI. Python itself is provisioned by uv, not by mise.
+
+```shell
+mise trust
+mise install
+```
+
+If your shell is not already configured for mise, add `mise activate <shell>` to your shell profile or prefix commands with `mise exec --`.
+
+### Common Tasks
+
+| Command | Description |
+| --- | --- |
+| `mise run build` | Build the plugin in Release. |
+| `mise run test` | Run the xUnit test suite. |
+| `mise run lint` | Verify formatting and analyzer rules without modifying files. |
+| `mise run package` | Build the Jellyfin plugin zip into `artifacts/`. |
+| `mise run verify` | Run build, lint, test, and package sequentially. |
+
+### Smoke Test with Jellyfin
+
+The plugin can be loaded in a throwaway Jellyfin container to confirm it starts:
+
+```powershell
+mise run package
+
+$plugin = "$PWD\artifacts\plugin"
+Expand-Archive artifacts\better-posters_*.zip -DestinationPath $plugin -Force
+
+docker run -d --name jf-better-posters -p 8097:8096 `
+  --mount "type=bind,source=$plugin,target=/config/plugins/BetterPosters" `
+  jellyfin/jellyfin:10.11.10
+
+docker logs jf-better-posters 2>&1 | Select-String "Better Posters"
+```
+
+A healthy startup logs:
+
+```text
+Loaded plugin: Better Posters <version>
+```
+
+Then open `http://localhost:8097` to complete the Jellyfin setup wizard. Clean up with:
+
+```shell
+docker rm -f jf-better-posters
+```
+
+### Release
+
+Releases are published by GitHub Actions when a bare SemVer tag is pushed:
+
+```shell
+git tag 1.2.3
+git push origin 1.2.3
+```
+
+Before tagging, align `CHANGELOG.md` and `build.yaml` (see `AGENTS.md`).
 
 ## Troubleshooting
 
