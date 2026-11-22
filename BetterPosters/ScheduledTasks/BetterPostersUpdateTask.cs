@@ -89,10 +89,14 @@ public class BetterPostersUpdateTask : IScheduledTask, IConfigurableScheduledTas
         var updatedCount = 0;
         var skippedCount = 0;
         var failedCount = 0;
+        var itemCount = items.Count;
 
-        _logger.LogInformation("Updating Better Posters images for {ItemCount} items", items.Count);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("Updating Better Posters images for {ItemCount} items", itemCount);
+        }
 
-        for (var index = 0; index < items.Count; index++)
+        for (var index = 0; index < itemCount; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var result = await UpdateItem(items[index], configuration, cancellationToken).ConfigureAwait(false);
@@ -109,14 +113,17 @@ public class BetterPostersUpdateTask : IScheduledTask, IConfigurableScheduledTas
                     break;
             }
 
-            progress.Report((index + 1) * 100D / items.Count);
+            progress.Report((index + 1) * 100D / itemCount);
         }
 
-        _logger.LogInformation(
-            "Better Posters update finished: {UpdatedCount} updated, {SkippedCount} skipped, {FailedCount} failed",
-            updatedCount,
-            skippedCount,
-            failedCount);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation(
+                "Better Posters update finished: {UpdatedCount} updated, {SkippedCount} skipped, {FailedCount} failed",
+                updatedCount,
+                skippedCount,
+                failedCount);
+        }
     }
 
     /// <inheritdoc />

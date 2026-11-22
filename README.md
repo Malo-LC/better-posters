@@ -13,9 +13,9 @@
 
 </div>
 
-**Minimum Jellyfin version:** 10.11.10
+**Minimum Jellyfin version:** 12.4
 
-> **Maintained fork.** This repository is a hard fork of the archived [neurekadev/better-posters](https://github.com/neurekadev/better-posters). It keeps the original plugin GUID and configuration format, and is maintained against the latest Jellyfin 10.11.x release.
+> **Maintained fork.** This repository is a hard fork of the archived [neurekadev/better-posters](https://github.com/neurekadev/better-posters). It keeps the original plugin GUID and configuration format, and is maintained against the latest Jellyfin 12.4.x release. Jellyfin 10.11 and older are no longer supported.
 
 ## Features
 
@@ -62,7 +62,7 @@ mise run package
 
 The plugin zip is written to `artifacts/better-posters_<version>.zip`. Extract it into a Better Posters plugin folder under your Jellyfin plugins directory and restart Jellyfin.
 
-The plugin targets Jellyfin 10.11.10 and may not load on older Jellyfin versions.
+The plugin targets Jellyfin 12.4 and will not load on Jellyfin 10.11 or older.
 
 ## Configuration & Setup
 
@@ -168,11 +168,14 @@ $plugin = "$PWD\artifacts\plugin"
 Expand-Archive artifacts\better-posters_*.zip -DestinationPath $plugin -Force
 
 docker run -d --name jf-better-posters -p 8097:8096 `
-  --mount "type=bind,source=$plugin,target=/config/plugins/BetterPosters" `
-  jellyfin/jellyfin:10.11.10
+  -e PUID=1000 -e PGID=1000 -e TZ=Etc/UTC `
+  --mount "type=bind,source=$plugin,target=/config/data/plugins/BetterPosters" `
+  lscr.io/linuxserver/jellyfin:latest
 
 docker logs jf-better-posters 2>&1 | Select-String "Better Posters"
 ```
+
+`lscr.io/linuxserver/jellyfin:latest` tracks the latest stable Jellyfin release (12.4 at the time of writing). Pin `version-12.4ubu2604` to stay on that exact build. The linuxserver image keeps Jellyfin data under `/config/data`, so plugins belong in `/config/data/plugins`.
 
 A healthy startup logs:
 
@@ -200,7 +203,7 @@ Before tagging, align `CHANGELOG.md` and `build.yaml` (see `AGENTS.md`).
 ## Troubleshooting
 
 - **No Better Posters image appears:** Confirm the item has an IMDb ID. This plugin intentionally uses IMDb IDs for btttr.cc URLs.
-- **Plugin does not load:** Confirm the server is Jellyfin 10.11.10 or newer in the 10.11 line and restart Jellyfin after copying the plugin DLL.
+- **Plugin does not load:** Confirm the server is Jellyfin 12.4 or newer and restart Jellyfin after copying the plugin DLL. Plugins built for Jellyfin 10.11 will not load on Jellyfin 12.
 - **Poster did not change after selecting one:** Clear the browser cache or check another Jellyfin client. Jellyfin and browsers can cache images aggressively.
 
 ## Disclaimer

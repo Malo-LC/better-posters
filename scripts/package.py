@@ -42,7 +42,7 @@ def build() -> int:
             "--dotnet-configuration",
             "Release",
             "--dotnet-framework",
-            "net9.0",
+            "net10.0",
         ],
         env=env,
     )

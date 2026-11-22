@@ -98,7 +98,7 @@ jobs:
             --output artifacts \
             --dotnet-configuration Release \
             --version "$VERSION.0" \
-            --dotnet-framework net9.0
+            --dotnet-framework net10.0
 
           mapfile -t packages < <(find artifacts -maxdepth 1 -type f -name '*.zip')
           if [[ "${#packages[@]}" -ne 1 ]]; then

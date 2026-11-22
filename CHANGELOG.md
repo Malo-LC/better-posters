@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-11-16
+
+### Changed
+- Target Jellyfin 12.4 only. Jellyfin 10.11 and older are no longer supported.
+- Rebuild the plugin against .NET 10 (`net10.0`) and the Jellyfin 12.4 packages.
+
 ## [1.0.5] - 2026-08-25
 
 ### Changed
@@ -44,10 +50,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add Better Posters as a Jellyfin image provider for movie and show posters from btttr.cc.
 
-[Unreleased]: https://github.com/neurekadev/better-posters/compare/1.0.5...HEAD
-[1.0.5]: https://github.com/neurekadev/better-posters/compare/1.0.4...1.0.5
-[1.0.4]: https://github.com/neurekadev/better-posters/compare/1.0.3...1.0.4
-[1.0.3]: https://github.com/neurekadev/better-posters/compare/1.0.2...1.0.3
-[1.0.2]: https://github.com/neurekadev/better-posters/compare/1.0.1...1.0.2
-[1.0.1]: https://github.com/neurekadev/better-posters/compare/1.0.0...1.0.1
-[1.0.0]: https://github.com/neurekadev/better-posters/tree/1.0.0
+[Unreleased]: https://github.com/Malo-LC/better-posters/compare/2.0.0...HEAD
+[2.0.0]: https://github.com/Malo-LC/better-posters/compare/1.0.5...2.0.0
+[1.0.5]: https://github.com/Malo-LC/better-posters/compare/1.0.4...1.0.5
+[1.0.4]: https://github.com/Malo-LC/better-posters/compare/1.0.3...1.0.4
+[1.0.3]: https://github.com/Malo-LC/better-posters/compare/1.0.2...1.0.3
+[1.0.2]: https://github.com/Malo-LC/better-posters/compare/1.0.1...1.0.2
+[1.0.1]: https://github.com/Malo-LC/better-posters/compare/1.0.0...1.0.1
+[1.0.0]: https://github.com/Malo-LC/better-posters/tree/1.0.0

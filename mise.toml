@@ -1,6 +1,6 @@
 [tools]
-# Jellyfin 10.11 plugins target .NET 9 (net9.0).
-dotnet = "9.0.321"
+# Jellyfin 12.4 plugins target .NET 10 (net10.0).
+dotnet = "10.0.404"
 # uv provisions Python 3.13 (matching CI) and installs JPRM.
 uv = "0.13.8"
 "pypi:jprm" = { version = "1.1.0", python = "3.13" }

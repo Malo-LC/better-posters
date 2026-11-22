@@ -2,9 +2,9 @@
 
 ## Project Overview
 
-- Better Posters is a Jellyfin plugin written in C# targeting `net9.0`. It registers a remote primary image provider for Movies and Series and builds poster URLs served by [btttr.cc](https://btttr.cc).
+- Better Posters is a Jellyfin plugin written in C# targeting `net10.0`. It registers a remote primary image provider for Movies and Series and builds poster URLs served by [btttr.cc](https://btttr.cc).
 - This repository is a maintained hard fork of the archived [neurekadev/better-posters](https://github.com/neurekadev/better-posters). The default branch is `master`.
-- Compatibility target: the latest Jellyfin 10.11.x release. When bumping Jellyfin support, update the `Jellyfin.Controller`/`Jellyfin.Model` package versions, `build.yaml` `targetAbi`, and the README minimum version together.
+- Compatibility target: the latest Jellyfin 12.4.x release only. Jellyfin 10.11 and older are not supported. When bumping Jellyfin support, update the `Jellyfin.Controller`/`Jellyfin.Model` package versions, `build.yaml` `targetAbi` and `framework`, `mise.toml` `dotnet`, and the README minimum version together.
 
 ## Invariants
 
@@ -25,7 +25,7 @@
   - `mise run package` - build `artifacts/better-posters_<version>.zip` through `scripts/package.py` (JPRM).
   - `mise run verify` - build, lint, test, then package, in that order. This must pass before considering a change done.
 - CI installs every tool through `jdx/mise-action` from `mise.toml` (pinned by commit SHA with the release in a comment). Do not add `setup-dotnet`, `setup-python`, or `setup-uv` steps: bump versions in `mise.toml` only.
-- A local smoke test can load the packaged plugin into `jellyfin/jellyfin:10.11.10` and check the `Loaded plugin: Better Posters <version>` log line. See the README.
+- A local smoke test can load the packaged plugin into `lscr.io/linuxserver/jellyfin:latest` (Jellyfin 12.4) and check the `Loaded plugin: Better Posters <version>` log line. See the README.
 
 ## Code Style
 
@@ -48,4 +48,4 @@
 - Releases are published by GitHub Actions (`.github/workflows/CI.yml`) when a bare SemVer tag (for example `1.2.3`) is pushed. The workflow packages the plugin with JPRM, publishes a GitHub Release with the zip and checksums attached, and regenerates and commits `manifest.json` to the default branch.
 - `CHANGELOG.md` must contain a released section matching the tag (`## [1.2.3] - ...`); the workflow reads it for the release notes and fails if it is missing.
 - The release job uses the repository-scoped `GITHUB_TOKEN` with `contents: write`; no separate manifest token is required.
-- README badges and install URLs point at the fork (`Malo-LC/better-posters`). `build.yaml` `owner`/`imageUrl` still reference the upstream project; update them only when the fork is ready to publish its own catalog metadata.
+- README badges and install URLs, `build.yaml` `owner`/`imageUrl`, and the CHANGELOG compare links all point at the fork (`Malo-LC/better-posters`). The release workflow uses `GITHUB_REPOSITORY`, so releases and `manifest.json` updates always land on the repository that owns the tag.
